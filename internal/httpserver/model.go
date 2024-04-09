@@ -1,7 +1,9 @@
 package httpserver
 
 import (
+	"context"
 	"net/http"
+	"sync"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -42,10 +44,18 @@ func (h *HTTPService) SetupHandlers(urlHandler *httphandlers.Handler) {
 	h.mux.Get("/{alias}", urlHandler.GetURL)
 }
 
-func (h *HTTPService) Run() {
+func (h *HTTPService) Run(wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	err := h.srv.ListenAndServe()
 	if err != nil {
 		logrus.Errorf("cannot start server: %s", err.Error())
-		panic(err)
+	}
+}
+
+func (h *HTTPService) Shutdown(ctx context.Context) {
+	if err := h.srv.Shutdown(ctx); err != nil {
+		logrus.Errorf("failed to stop server %s", err.Error())
+		return
 	}
 }

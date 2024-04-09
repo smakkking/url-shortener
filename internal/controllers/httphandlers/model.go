@@ -36,7 +36,7 @@ func (h *Handler) SaveURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	outputURL, err := h.urlService.SaveURL(*inputURL)
+	outputURL, err := h.urlService.SaveURL(r.Context(), *inputURL)
 	if err != nil {
 		render.JSON(w, r, Error("can't save url"))
 		return
@@ -48,7 +48,7 @@ func (h *Handler) SaveURL(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) GetURL(w http.ResponseWriter, r *http.Request) {
 	alias := chi.URLParam(r, "alias")
 
-	outputURL, err := h.urlService.GetURL(alias)
+	outputURL, err := h.urlService.GetURL(r.Context(), alias)
 	if err != nil {
 		render.JSON(w, r, Error("can't get url"))
 		return

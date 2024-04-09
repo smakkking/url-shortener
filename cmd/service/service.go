@@ -1,7 +1,12 @@
 package main
 
 import (
+	"context"
 	"os"
+	"os/signal"
+	"sync"
+	"syscall"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/smakkking/url-shortener/internal/app"
@@ -17,6 +22,9 @@ const (
 )
 
 func main() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	// init логгер
 	logrus.SetFormatter(
 		&logrus.JSONFormatter{
@@ -48,10 +56,31 @@ func main() {
 	// запуск сервера HTTP
 	srvHTTP := httpserver.NewServer(config)
 	srvHTTP.SetupHandlers(urlHandler)
-	go srvHTTP.Run()
 
 	srvGRPC := grpcserver.NewGRPCServer(config)
-	go srvGRPC.Run()
+
+	// running
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	wg := &sync.WaitGroup{}
+	wg.Add(2)
+
+	go srvHTTP.Run(wg)
+	go srvGRPC.Run(wg)
+
+	logrus.Infoln("server started")
 
 	// graceful shutdown
+	<-done
+
+	// TODO: move timeout to config
+	shutDownCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+
+	srvHTTP.Shutdown(shutDownCtx)
+	srvGRPC.Shutdown(shutDownCtx)
+
+	wg.Wait()
+	logrus.Infoln("server stopped")
 }

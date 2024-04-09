@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"errors"
 	"net/url"
 
@@ -17,14 +18,14 @@ type Service struct {
 }
 
 type Storage interface {
-	SaveURL(string, url.URL) error
-	GetURL(string) (url.URL, error)
+	SaveURL(context.Context, string, url.URL) error
+	GetURL(context.Context, string) (url.URL, error)
 }
 
-func (s *Service) SaveURL(urlToSave url.URL) (string, error) {
+func (s *Service) SaveURL(ctx context.Context, urlToSave url.URL) (string, error) {
 	key := keygenerator.GenRandomString(10)
 
-	err := s.urlStorage.SaveURL(key, urlToSave)
+	err := s.urlStorage.SaveURL(ctx, key, urlToSave)
 	if err != nil {
 		return "", ErrSavingURL
 	}
@@ -33,6 +34,6 @@ func (s *Service) SaveURL(urlToSave url.URL) (string, error) {
 
 }
 
-func (s *Service) GetURL(key string) (url.URL, error) {
-	return s.urlStorage.GetURL(key)
+func (s *Service) GetURL(ctx context.Context, key string) (url.URL, error) {
+	return s.urlStorage.GetURL(ctx, key)
 }

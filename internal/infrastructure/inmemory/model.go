@@ -1,6 +1,7 @@
 package inmemory
 
 import (
+	"context"
 	"errors"
 	"net/url"
 	"sync"
@@ -14,12 +15,12 @@ type Storage struct {
 	db sync.Map
 }
 
-func (s *Storage) SaveURL(key string, urlToSave url.URL) error {
+func (s *Storage) SaveURL(ctx context.Context, key string, urlToSave url.URL) error {
 	s.db.Store(key, urlToSave)
 	return nil
 }
 
-func (s *Storage) GetURL(key string) (url.URL, error) {
+func (s *Storage) GetURL(ctx context.Context, key string) (url.URL, error) {
 	data, ok := s.db.Load(key)
 	if !ok {
 		return url.URL{}, ErrNotFound

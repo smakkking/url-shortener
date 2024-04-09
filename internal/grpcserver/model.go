@@ -1,7 +1,9 @@
 package grpcserver
 
 import (
+	"context"
 	"net"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 	"github.com/smakkking/url-shortener/internal/app"
@@ -28,18 +30,20 @@ func NewGRPCServer(config app.Config) *GRPCService {
 	return gRPC
 }
 
-func (s *GRPCService) Run() {
+func (s *GRPCService) Run(wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	l, err := net.Listen("tcp", ":"+s.Port)
 	if err != nil {
 		panic("cant listen socket")
 	}
+	defer l.Close()
 
 	if err = s.grpcServer.Serve(l); err != nil {
 		logrus.Errorf("cannot start server: %s", err.Error())
-		panic("cant serve")
 	}
 }
 
-func (s *GRPCService) Shutdown() {
+func (s *GRPCService) Shutdown(ctx context.Context) {
 	s.grpcServer.Stop()
 }
