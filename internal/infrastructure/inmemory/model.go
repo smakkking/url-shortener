@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	ErrNotFound = errors.New("no such key")
+	ErrNotFound = errors.New("no such key, can't find value in memory")
 )
 
 type Storage struct {

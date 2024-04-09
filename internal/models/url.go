@@ -4,6 +4,6 @@ import "net/url"
 
 type URLKey string
 
-func (u *URLKey) Transform() (url.URL, error) {
-	return url.URL{}, nil
+func (u *URLKey) Transform() url.URL {
+	return url.URL{}
 }
