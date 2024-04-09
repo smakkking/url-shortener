@@ -19,7 +19,7 @@ type ServerAPI struct {
 }
 
 func (s *ServerAPI) Get(ctx context.Context, req *urlshortener_grpc.GetRequest) (*urlshortener_grpc.GetResponce, error) {
-	outputURL, err := s.urlService.GetURL(req.Alias)
+	outputURL, err := s.urlService.GetURL(ctx, req.Alias)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "can't find url by this alias")
 	}
@@ -35,7 +35,7 @@ func (s *ServerAPI) Save(ctx context.Context, req *urlshortener_grpc.SaveRequest
 		return nil, status.Error(codes.InvalidArgument, "give an url")
 	}
 
-	alias, err := s.urlService.SaveURL(*inputURL)
+	alias, err := s.urlService.SaveURL(ctx, *inputURL)
 	if err != nil {
 		return nil, status.Error(codes.Unknown, "internal error")
 	}

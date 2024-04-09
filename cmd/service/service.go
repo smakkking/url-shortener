@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"os"
 	"os/signal"
 	"sync"
@@ -14,11 +15,13 @@ import (
 	"github.com/smakkking/url-shortener/internal/grpcserver"
 	"github.com/smakkking/url-shortener/internal/httpserver"
 	"github.com/smakkking/url-shortener/internal/infrastructure/inmemory"
+	"github.com/smakkking/url-shortener/internal/infrastructure/postgres"
 	"github.com/smakkking/url-shortener/internal/services"
 )
 
 const (
 	configPath = "./config/config.yaml"
+	dbType     = "inmemory"
 )
 
 func main() {
@@ -45,10 +48,21 @@ func main() {
 	}
 
 	// init репозитории
-	inmemoryStorage := inmemory.NewStorage()
+	var store services.Storage
+
+	if dbType == "inmemory" {
+		store = inmemory.NewStorage()
+	} else if dbType == "postgres" {
+		store, err = postgres.NewStorage(config)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		panic(errors.New("no such storage type"))
+	}
 
 	// init сервисы
-	urlService := services.NewService(inmemoryStorage)
+	urlService := services.NewService(store)
 
 	// init хендлеры
 	urlHandler := httphandlers.NewHandler(urlService)
