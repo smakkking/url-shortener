@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = "urlshortener_grpc";
+
+service URLShortener {
+    rpc Get(GetRequest) returns (GetResponce);
+    rpc Save(SaveRequest) returns (SaveResponce);
+}
+
+message GetRequest {
+    string alias = 1;
+}
+
+message GetResponce {
+    string original_url = 1;
+}
+
+message SaveRequest {
+    string url = 1;
+}
+
+message SaveResponce {
+    string alias = 1;
+}

@@ -44,7 +44,7 @@ func main() {
 	// init хендлеры
 	urlHandler := httphandlers.NewHandler(urlService)
 
-	// запуск сервера
+	// запуск сервера HTTP
 	srv := httpserver.NewServer(config)
 	srv.SetupHandlers(urlHandler)
 	srv.Run()
