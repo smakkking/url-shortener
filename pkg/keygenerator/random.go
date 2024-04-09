@@ -3,12 +3,10 @@ package keygenerator
 import (
 	"math/rand"
 	"time"
-
-	"github.com/smakkking/url-shortener/internal/models"
 )
 
 // GenRandomString генерирует случайную строку из символов A-Za-z0-0-9_
-func GenRandomString(size int) models.URLKey {
+func GenRandomString(size int) string {
 	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
@@ -20,5 +18,5 @@ func GenRandomString(size int) models.URLKey {
 		b[i] = chars[rnd.Intn(len(chars))]
 	}
 
-	return models.URLKey(b)
+	return string(b)
 }

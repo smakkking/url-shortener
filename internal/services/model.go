@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/url"
 
-	"github.com/smakkking/url-shortener/internal/models"
+	"github.com/smakkking/url-shortener/pkg/keygenerator"
 )
 
 var (
@@ -17,15 +17,22 @@ type Service struct {
 }
 
 type Storage interface {
-	SaveURL(url.URL) (models.URLKey, error)
-	GetURL(models.URLKey) (url.URL, error)
+	SaveURL(string, url.URL) error
+	GetURL(string) (url.URL, error)
 }
 
-func (s *Service) SaveURL(urlToSave url.URL) (models.URLKey, error) {
-	return s.urlStorage.SaveURL(urlToSave)
+func (s *Service) SaveURL(urlToSave url.URL) (string, error) {
+	key := "http://url-shortener.ru/" + keygenerator.GenRandomString(10)
+
+	err := s.urlStorage.SaveURL(key, urlToSave)
+	if err != nil {
+		return "", ErrSavingURL
+	}
+
+	return key, nil
 
 }
 
-func (s *Service) GetURL(key models.URLKey) (url.URL, error) {
+func (s *Service) GetURL(key string) (url.URL, error) {
 	return s.urlStorage.GetURL(key)
 }

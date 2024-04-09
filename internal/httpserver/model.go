@@ -38,6 +38,8 @@ func (h *HTTPService) SetupHandlers(urlHandler *httphandlers.Handler) {
 	h.mux.Use(middleware.Recoverer)
 	h.mux.Use(middleware.URLFormat)
 
+	h.mux.Post("/create", urlHandler.SaveURL)
+	h.mux.Post("/get", urlHandler.GetURL)
 }
 
 func (h *HTTPService) Run() error {

@@ -4,9 +4,6 @@ import (
 	"errors"
 	"net/url"
 	"sync"
-
-	"github.com/smakkking/url-shortener/internal/models"
-	"github.com/smakkking/url-shortener/pkg/keygenerator"
 )
 
 var (
@@ -17,13 +14,12 @@ type Storage struct {
 	db sync.Map
 }
 
-func (s *Storage) SaveURL(urlToSave url.URL) (models.URLKey, error) {
-	key := keygenerator.GenRandomString(10)
+func (s *Storage) SaveURL(key string, urlToSave url.URL) error {
 	s.db.Store(key, urlToSave)
-	return key, nil
+	return nil
 }
 
-func (s *Storage) GetURL(key models.URLKey) (url.URL, error) {
+func (s *Storage) GetURL(key string) (url.URL, error) {
 	data, ok := s.db.Load(key)
 	if !ok {
 		return url.URL{}, ErrNotFound
