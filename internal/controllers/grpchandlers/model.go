@@ -2,12 +2,14 @@ package grpchandlers
 
 import (
 	"context"
-	"fmt"
+	"net/url"
 
 	"github.com/smakkking/url-shortener/internal/services"
 	"github.com/smakkking/url-shortener/pkg/sdk/go/urlshortener_grpc"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type serverAPI struct {
@@ -23,29 +25,28 @@ func Register(gRPC *grpc.Server) {
 }
 
 func (s *serverAPI) Get(ctx context.Context, req *urlshortener_grpc.GetRequest) (*urlshortener_grpc.GetResponce, error) {
-	return &urlshortener_grpc.GetResponce{}
-}
-
-func (s *serverAPI) Add(ctx context.Context, req *calcv1.Request) (*calcv1.Responce, error) {
-	res := req.A + req.B
-	return &calcv1.Responce{Result: res}, nil
-}
-
-func (s *serverAPI) Sub(ctx context.Context, req *calcv1.Request) (*calcv1.Responce, error) {
-	res := req.A - req.B
-	return &calcv1.Responce{Result: res}, nil
-}
-
-func (s *serverAPI) Mul(ctx context.Context, req *calcv1.Request) (*calcv1.Responce, error) {
-	res := req.A * req.B
-	return &calcv1.Responce{Result: res}, nil
-}
-
-func (s *serverAPI) Div(ctx context.Context, req *calcv1.Request) (*calcv1.Responce, error) {
-	if req.B == 0 {
-		return nil, fmt.Errorf("division by 0")
+	outputURL, err := s.urlService.GetURL(req.Alias)
+	if err != nil {
+		return nil, status.Error(codes.NotFound, "can't find url by this alias")
 	}
 
-	res := req.A / req.B
-	return &calcv1.Responce{Result: res}, nil
+	return &urlshortener_grpc.GetResponce{
+		OriginalUrl: outputURL.String(),
+	}, nil
+}
+
+func (s *serverAPI) Save(ctx context.Context, req *urlshortener_grpc.SaveRequest) (*urlshortener_grpc.SaveResponce, error) {
+	inputURL, err := url.Parse(req.Url)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "give an url")
+	}
+
+	alias, err := s.urlService.SaveURL(*inputURL)
+	if err != nil {
+		return nil, status.Error(codes.Unknown, "internal error")
+	}
+
+	return &urlshortener_grpc.SaveResponce{
+		Alias: alias,
+	}, nil
 }
