@@ -13,12 +13,14 @@ type Config struct {
 	HTTPWriteTimeout time.Duration `yaml:"HTTP_WRITE_TIMEOUT" env:"PG_HOST"`
 	HTTPIdleTimeout  time.Duration `yaml:"HTTP_IDLE_TIMEOUT" env:"PG_HOST"`
 
-	PgHost      string `yaml:"PG_HOST" env:"PG_HOST"`
-	PG_PASSWORD string `yaml:"PG_PASSWORD" env:"PG_PASSWORD"`
-	PG_PORT     string `yaml:"PG_PORT" env:"PG_PORT"`
-	PG_DBNAME   string `yaml:"PG_DBNAME" env:"PG_DBNAME"`
-	PG_USER     string `yaml:"PG_USER" env:"PG_USER"`
-	PG_SSLMODE  string `yaml:"PG_SSLMODE" env:"PG_SSLMODE"`
+	PgHost     string `yaml:"PG_HOST" env:"PG_HOST"`
+	PgPassword string `yaml:"PG_PASSWORD" env:"PG_PASSWORD"`
+	PgPort     string `yaml:"PG_PORT" env:"PG_PORT"`
+	PgDBName   string `yaml:"PG_DBNAME" env:"PG_DBNAME"`
+	PgUser     string `yaml:"PG_USER" env:"PG_USER"`
+	PgSSLMode  string `yaml:"PG_SSLMODE" env:"PG_SSLMODE"`
+
+	GrpcPort string `yaml:"GRPC_PORT" env:"GRPC_PORT"`
 }
 
 func NewConfig(config_path string) (Config, error) {

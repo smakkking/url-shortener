@@ -9,3 +9,5 @@ PG_DBNAME: "urls"
 PG_USER: "postgres"
 PG_PASSWORD: "postgres"
 PG_SSLMODE: "disable"
+
+GRPC_PORT: "12345"

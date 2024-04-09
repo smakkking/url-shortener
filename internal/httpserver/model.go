@@ -42,11 +42,10 @@ func (h *HTTPService) SetupHandlers(urlHandler *httphandlers.Handler) {
 	h.mux.Get("/{alias}", urlHandler.GetURL)
 }
 
-func (h *HTTPService) Run() error {
+func (h *HTTPService) Run() {
 	err := h.srv.ListenAndServe()
 	if err != nil {
 		logrus.Errorf("cannot start server: %s", err.Error())
-		return err
+		panic(err)
 	}
-	return nil
 }

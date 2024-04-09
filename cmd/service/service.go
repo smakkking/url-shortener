@@ -6,6 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/smakkking/url-shortener/internal/app"
 	"github.com/smakkking/url-shortener/internal/controllers/httphandlers"
+	"github.com/smakkking/url-shortener/internal/grpcserver"
 	"github.com/smakkking/url-shortener/internal/httpserver"
 	"github.com/smakkking/url-shortener/internal/infrastructure/inmemory"
 	"github.com/smakkking/url-shortener/internal/services"
@@ -45,8 +46,12 @@ func main() {
 	urlHandler := httphandlers.NewHandler(urlService)
 
 	// запуск сервера HTTP
-	srv := httpserver.NewServer(config)
-	srv.SetupHandlers(urlHandler)
-	srv.Run()
+	srvHTTP := httpserver.NewServer(config)
+	srvHTTP.SetupHandlers(urlHandler)
+	go srvHTTP.Run()
+
+	srvGRPC := grpcserver.NewGRPCServer(config)
+	go srvGRPC.Run()
+
 	// graceful shutdown
 }
