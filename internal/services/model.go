@@ -22,14 +22,14 @@ type Storage interface {
 }
 
 func (s *Service) SaveURL(urlToSave url.URL) (string, error) {
-	key := "http://url-shortener.ru/" + keygenerator.GenRandomString(10)
+	key := keygenerator.GenRandomString(10)
 
 	err := s.urlStorage.SaveURL(key, urlToSave)
 	if err != nil {
 		return "", ErrSavingURL
 	}
 
-	return key, nil
+	return "http://localhost:8080/" + key, nil
 
 }
 

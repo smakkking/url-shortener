@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
+	"github.com/sirupsen/logrus"
 
 	"github.com/smakkking/url-shortener/internal/services"
 )
@@ -15,41 +17,42 @@ type Handler struct {
 }
 
 type R struct {
-	URL url.URL `json:"url"`
+	URL string `json:"url"`
 }
 
 func (h *Handler) SaveURL(w http.ResponseWriter, r *http.Request) {
-	inputURL := new(R)
-	err := json.NewDecoder(r.Body).Decode(&inputURL)
+	data := new(R)
+	err := json.NewDecoder(r.Body).Decode(data)
 	if err != nil {
+		logrus.Errorf("%s", err.Error())
 		render.JSON(w, r, Error("invalid input json"))
 		return
 	}
 
-	outputURL, err := h.urlService.SaveURL(inputURL.URL)
+	inputURL, err := url.Parse(data.URL)
 	if err != nil {
-		render.JSON(w, r, Error("can't save url"))
+		logrus.Errorf("%s", err.Error())
+		render.JSON(w, r, Error("invalid input data"))
 		return
 	}
 
-	tmp, _ := url.Parse(outputURL)
-
-	render.JSON(w, r, R{URL: *tmp})
-}
-
-func (h *Handler) GetURL(w http.ResponseWriter, r *http.Request) {
-	inputURL := new(R)
-	err := json.NewDecoder(r.Body).Decode(&inputURL)
-	if err != nil {
-		render.JSON(w, r, Error("invalid input json"))
-		return
-	}
-
-	outputURL, err := h.urlService.GetURL(inputURL.URL.String())
+	outputURL, err := h.urlService.SaveURL(*inputURL)
 	if err != nil {
 		render.JSON(w, r, Error("can't save url"))
 		return
 	}
 
 	render.JSON(w, r, R{URL: outputURL})
+}
+
+func (h *Handler) GetURL(w http.ResponseWriter, r *http.Request) {
+	alias := chi.URLParam(r, "alias")
+
+	outputURL, err := h.urlService.GetURL(alias)
+	if err != nil {
+		render.JSON(w, r, Error("can't get url"))
+		return
+	}
+
+	render.JSON(w, r, R{URL: outputURL.String()})
 }
