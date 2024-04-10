@@ -37,9 +37,7 @@ func NewServer(cfg app.Config) *HTTPService {
 func (h *HTTPService) SetupHandlers(urlHandler *httphandlers.Handler) {
 	// setup middleware
 	h.mux.Use(middleware.RequestID)
-	h.mux.Use(middleware.Logger)
 	h.mux.Use(middleware.Recoverer)
-	h.mux.Use(middleware.URLFormat)
 
 	h.mux.Post("/create", urlHandler.SaveURL)
 	h.mux.Get("/{alias}", urlHandler.GetURL)

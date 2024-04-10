@@ -17,6 +17,7 @@ import (
 	"github.com/smakkking/url-shortener/internal/infrastructure/inmemory"
 	"github.com/smakkking/url-shortener/internal/infrastructure/postgres"
 	"github.com/smakkking/url-shortener/internal/services"
+	"github.com/smakkking/url-shortener/pkg/keygenerator"
 )
 
 const (
@@ -55,7 +56,7 @@ func main() {
 	}
 
 	// init сервисы
-	urlService := services.NewService(store)
+	urlService := services.NewService(store, keygenerator.RandomKeyGenerator{})
 
 	// init хендлеры
 	urlHandler := httphandlers.NewHandler(urlService)
