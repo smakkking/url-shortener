@@ -1,4 +1,4 @@
 CREATE TABLE Urls(
-    alias TEXT UNIQUE NOT NULL,
-    url_value TEXT NOT NULL
+    alias TEXT NOT NULL,
+    url_value TEXT UNIQUE NOT NULL
 );

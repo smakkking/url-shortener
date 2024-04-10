@@ -13,7 +13,7 @@ func (s *Service) SaveURL(ctx context.Context, urlToSave url.URL) (string, error
 
 	key := keygenerator.GenRandomString(10)
 
-	err := s.urlStorage.SaveURL(ctx, key, urlToSave)
+	key, err := s.urlStorage.SaveURL(ctx, key, urlToSave)
 	if err != nil {
 		return "", fmt.Errorf("%s: %w", op, err)
 	}

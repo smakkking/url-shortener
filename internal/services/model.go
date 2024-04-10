@@ -10,6 +10,6 @@ type Service struct {
 }
 
 type Storage interface {
-	SaveURL(context.Context, string, url.URL) error
+	SaveURL(context.Context, string, url.URL) (string, error)
 	GetURL(context.Context, string) (url.URL, error)
 }

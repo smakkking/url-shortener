@@ -2,6 +2,7 @@ package inmemory
 
 import (
 	"errors"
+	"net/url"
 	"sync"
 )
 
@@ -10,11 +11,14 @@ var (
 )
 
 type Storage struct {
-	db sync.Map
+	mu         sync.RWMutex
+	aliasToURL map[string]url.URL
+	urlToAlias map[url.URL]string
 }
 
 func NewStorage() *Storage {
 	return &Storage{
-		db: sync.Map{},
+		aliasToURL: make(map[string]url.URL),
+		urlToAlias: make(map[url.URL]string),
 	}
 }

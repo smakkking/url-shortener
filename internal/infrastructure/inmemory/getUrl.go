@@ -9,10 +9,13 @@ import (
 func (s *Storage) GetURL(ctx context.Context, key string) (url.URL, error) {
 	const op = "inmemory.GetURL"
 
-	data, ok := s.db.Load(key)
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	data, ok := s.aliasToURL[key]
 	if !ok {
 		return url.URL{}, fmt.Errorf("%s: %w", op, ErrNotFound)
 	}
 
-	return data.(url.URL), nil
+	return data, nil
 }

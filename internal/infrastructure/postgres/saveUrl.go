@@ -6,16 +6,17 @@ import (
 	"net/url"
 )
 
-func (s *Storage) SaveURL(ctx context.Context, key string, urlToSave url.URL) error {
+func (s *Storage) SaveURL(ctx context.Context, key string, urlToSave url.URL) (string, error) {
 	const op = "postgres.SaveURL"
+	var oldKey string
 
-	_, err := s.db.ExecContext(ctx,
-		"INSERT INTO Urls(alias, url_value) VALUES ($1, $2)",
+	err := s.db.QueryRowContext(ctx,
+		"INSERT INTO Urls(alias, url_value) VALUES ($1, $2) ON CONFLICT DO NOTHING RETURNING alias",
 		key, urlToSave.String(),
-	)
+	).Scan(&oldKey)
 	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
+		return oldKey, fmt.Errorf("%s: %w", op, err)
 	}
 
-	return nil
+	return oldKey, nil
 }
