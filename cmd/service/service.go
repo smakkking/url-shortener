@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"flag"
 	"os"
 	"os/signal"
 	"sync"
@@ -22,7 +23,7 @@ import (
 
 const (
 	configPath = "./config/config.yaml"
-	dbType     = "postgres"
+	// dbType     = "inmemory"
 )
 
 var (
@@ -33,23 +34,30 @@ func main() {
 	// init логгер
 	setupLogger()
 
+	dbType := flag.String("storage", "inmemory", "тип хранилища")
+	flag.Parse()
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
+	logrus.Infoln(*dbType)
 	logrus.Infoln("service started...")
 	logrus.Debugln("debug messages are available")
 
 	// загрузка конфига
-	config, err := app.MustLoadConfig(configPath)
+	config, _ := app.MustLoadConfig(configPath)
 
 	// init репозитории
 	var store services.Storage
 
-	if dbType == "inmemory" {
-		store = inmemory.NewStorage()
-	} else if dbType == "postgres" {
-		store, err = postgres.NewStorage(config)
-		if err != nil {
-			panic(err)
+	if dbType != nil {
+		if *dbType == "inmemory" {
+			store = inmemory.NewStorage()
+		} else if *dbType == "postgres" {
+			var err error
+			store, err = postgres.NewStorage(config)
+			if err != nil {
+				panic(err)
+			}
 		}
 	} else {
 		panic(errors.New("no such storage type"))
@@ -66,6 +74,7 @@ func main() {
 	srvHTTP.SetupHandlers(urlHandler)
 
 	srvGRPC := grpcserver.NewGRPCServer(config)
+	srvGRPC.RegisterHandlers(urlService)
 
 	// running
 	done := make(chan os.Signal, 1)
@@ -76,8 +85,6 @@ func main() {
 
 	go srvHTTP.Run(wg)
 	go srvGRPC.Run(wg)
-
-	logrus.Infoln("server started")
 
 	// graceful shutdown
 	<-done

@@ -26,7 +26,7 @@ func (h *Handler) SaveURL(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logrus.Errorf("can't save url! %v", fmt.Errorf("%s: %w", op, err))
 		w.WriteHeader(http.StatusBadRequest)
-		render.JSON(w, r, Error("invalid input data"))
+		render.JSON(w, r, Error("incorrect url"))
 		return
 	}
 
@@ -38,5 +38,6 @@ func (h *Handler) SaveURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.WriteHeader(http.StatusOK)
 	render.JSON(w, r, OK("http://localhost:8080/"+alias))
 }

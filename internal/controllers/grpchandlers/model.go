@@ -9,5 +9,5 @@ type ServerAPI struct {
 	// вот эта нужна, если вы неполностью реализовали service,
 	// там просто заглушки вместо методов стоят
 	urlshortener_grpc.UnimplementedURLShortenerServer
-	urlService *services.Service
+	UrlService *services.Service
 }

@@ -2,6 +2,7 @@ package httphandlers
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -34,6 +35,15 @@ func TestHandler_GetURL(t *testing.T) {
 			},
 			expectedStatusCode:  http.StatusOK,
 			expectedRequestBody: `{"status":"OK","url":"https://www.youtube.com/dsafsdf"}` + "\n",
+		},
+		{
+			name: "Такой сокращенной ссылки нет",
+			key:  "543fskdfkds21332",
+			mockBehaviour: func(ctx context.Context, s *mock_services.MockStorage) {
+				s.EXPECT().GetURL(ctx, "543fskdfkds21332").Return(url.URL{}, errors.New("can't get url"))
+			},
+			expectedStatusCode:  http.StatusNotFound,
+			expectedRequestBody: `{"status":"Error","error":"can't get url"}` + "\n",
 		},
 	}
 

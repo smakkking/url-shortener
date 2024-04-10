@@ -3,6 +3,7 @@ package httphandlers
 import (
 	"bytes"
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -35,6 +36,30 @@ func TestHandler_SaveURL(t *testing.T) {
 			},
 			expectedStatusCode:  http.StatusOK,
 			expectedRequestBody: `{"status":"OK","url":"http://localhost:8080/1234567890"}` + "\n",
+		},
+		{
+			name:                "Invalid json",
+			inputBody:           `345kj3k5l`,
+			mockBehaviour:       func(ctx context.Context, s *mock_services.MockStorage) {},
+			expectedStatusCode:  http.StatusBadRequest,
+			expectedRequestBody: `{"status":"Error","error":"invalid json"}` + "\n",
+		},
+		{
+			name:                "Incorrect url",
+			inputBody:           `{"url": "     %%2"}`,
+			mockBehaviour:       func(ctx context.Context, s *mock_services.MockStorage) {},
+			expectedStatusCode:  http.StatusBadRequest,
+			expectedRequestBody: `{"status":"Error","error":"incorrect url"}` + "\n",
+		},
+		{
+			name:      "Cant save url",
+			inputBody: `{"url": "https://www.youtube.com/dsafsdf"}`,
+			mockBehaviour: func(ctx context.Context, s *mock_services.MockStorage) {
+				inputURL, _ := url.Parse("https://www.youtube.com/dsafsdf")
+				s.EXPECT().SaveURL(ctx, "1234567890", *inputURL).Return("", errors.New("can't save url"))
+			},
+			expectedStatusCode:  http.StatusInternalServerError,
+			expectedRequestBody: `{"status":"Error","error":"can't save url"}` + "\n",
 		},
 	}
 

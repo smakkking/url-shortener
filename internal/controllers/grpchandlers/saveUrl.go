@@ -19,13 +19,13 @@ func (s *ServerAPI) Save(ctx context.Context, req *urlshortener_grpc.SaveRequest
 		return nil, status.Error(codes.InvalidArgument, "give an url")
 	}
 
-	alias, err := s.urlService.SaveURL(ctx, *inputURL)
+	alias, err := s.UrlService.SaveURL(ctx, *inputURL)
 	if err != nil {
 		logrus.Errorf("can't save url! %v", fmt.Errorf("%s: %w", op, err))
 		return nil, status.Error(codes.Unknown, "internal error")
 	}
 
 	return &urlshortener_grpc.SaveResponce{
-		Alias: "http://localhost:8080/" + alias,
+		Alias: alias,
 	}, nil
 }

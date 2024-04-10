@@ -13,7 +13,7 @@ import (
 func (s *ServerAPI) Get(ctx context.Context, req *urlshortener_grpc.GetRequest) (*urlshortener_grpc.GetResponce, error) {
 	const op = "grpchandler.Get"
 
-	outputURL, err := s.urlService.GetURL(ctx, req.Alias)
+	outputURL, err := s.UrlService.GetURL(ctx, req.Alias)
 	if err != nil {
 		logrus.Errorf("can't get url! %v", fmt.Errorf("%s: %w", op, err))
 		return nil, status.Error(codes.NotFound, "can't find url by this alias")

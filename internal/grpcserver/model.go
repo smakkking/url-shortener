@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/smakkking/url-shortener/internal/app"
 	"github.com/smakkking/url-shortener/internal/controllers/grpchandlers"
+	"github.com/smakkking/url-shortener/internal/services"
 	"github.com/smakkking/url-shortener/pkg/sdk/go/urlshortener_grpc"
 	"google.golang.org/grpc"
 )
@@ -19,15 +20,20 @@ type GRPCService struct {
 
 // вот эту нужно будет вызывать в main, чтобы получить grpc сервер работающий
 func NewGRPCServer(config app.Config) *GRPCService {
-	gRPC := &GRPCService{
+	return &GRPCService{
 		grpcServer: grpc.NewServer(),
 		Port:       config.GrpcPort,
 	}
+}
 
+func (s *GRPCService) RegisterHandlers(service *services.Service) {
 	// здесь регистрирутся вообще все сервисы, которые участвуют в GRPC
-	urlshortener_grpc.RegisterURLShortenerServer(gRPC.grpcServer, &grpchandlers.ServerAPI{})
 
-	return gRPC
+	urlshortener_grpc.RegisterURLShortenerServer(
+		s.grpcServer,
+		&grpchandlers.ServerAPI{
+			UrlService: service,
+		})
 }
 
 func (s *GRPCService) Run(wg *sync.WaitGroup) {
