@@ -56,7 +56,7 @@ func main() {
 	}
 
 	// init сервисы
-	urlService := services.NewService(store, keygenerator.RandomKeyGenerator{})
+	urlService := services.NewService(store, &keygenerator.RandomKeyGenerator{})
 
 	// init хендлеры
 	urlHandler := httphandlers.NewHandler(urlService)

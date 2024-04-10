@@ -9,15 +9,15 @@ type RandomKeyGenerator struct {
 }
 
 type FixedKeyGenerator struct {
-	key string
+	Key string
 }
 
 func (f FixedKeyGenerator) GenRandomString(size int) string {
-	return f.key
+	return f.Key
 }
 
 // GenRandomString генерирует случайную строку из символов A-Za-z0-0-9_
-func (r RandomKeyGenerator) GenRandomString(size int) string {
+func (r *RandomKeyGenerator) GenRandomString(size int) string {
 	rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +

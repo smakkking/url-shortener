@@ -1,7 +1,6 @@
 package httphandlers
 
 import (
-	"bytes"
 	"context"
 	"net/http"
 	"net/http/httptest"
@@ -16,25 +15,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestHandler_SaveURL(t *testing.T) {
+func TestHandler_GetURL(t *testing.T) {
 	type mockBehaviour func(ctx context.Context, s *mock_services.MockStorage)
 
 	testTable := []struct {
 		name                string
-		inputBody           string
 		mockBehaviour       mockBehaviour
+		key                 string
 		expectedStatusCode  int
 		expectedRequestBody string
 	}{
 		{
-			name:      "OK",
-			inputBody: `{"url": "https://www.youtube.com/dsafsdf"}`,
+			name: "OK",
+			key:  "1234567890",
 			mockBehaviour: func(ctx context.Context, s *mock_services.MockStorage) {
 				inputURL, _ := url.Parse("https://www.youtube.com/dsafsdf")
-				s.EXPECT().SaveURL(ctx, "1234567890", *inputURL).Return("1234567890", nil)
+				s.EXPECT().GetURL(ctx, "1234567890").Return(*inputURL, nil)
 			},
 			expectedStatusCode:  http.StatusOK,
-			expectedRequestBody: `{"status":"OK","url":"http://localhost:8080/1234567890"}` + "\n",
+			expectedRequestBody: `{"status":"OK","url":"https://www.youtube.com/dsafsdf"}` + "\n",
 		},
 	}
 
@@ -51,17 +50,14 @@ func TestHandler_SaveURL(t *testing.T) {
 
 			// test server
 			w := httptest.NewRecorder()
-			r := httptest.NewRequest(
-				http.MethodPost,
-				"/create",
-				bytes.NewBufferString(testCase.inputBody),
-			)
+			r := httptest.NewRequest(http.MethodGet, "/{alias}", nil)
 
 			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("alias", testCase.key)
 			r = r.WithContext(context.WithValue(r.Context(), chi.RouteCtxKey, rctx))
 			testCase.mockBehaviour(r.Context(), m)
 
-			handler.SaveURL(w, r)
+			handler.GetURL(w, r)
 
 			// Assert
 			assert.Equal(t, testCase.expectedStatusCode, w.Code)
