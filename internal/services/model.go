@@ -8,7 +8,7 @@ import (
 
 var (
 	ErrSavingURL  = errors.New("error while saving url")
-	ErrGettingURL = errors.New("error while saving url")
+	ErrGettingURL = errors.New("error while getting url")
 )
 
 type Service struct {
