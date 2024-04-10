@@ -21,7 +21,7 @@ import (
 
 const (
 	configPath = "./config/config.yaml"
-	dbType     = "postgres"
+	dbType     = "inmemory"
 )
 
 var (

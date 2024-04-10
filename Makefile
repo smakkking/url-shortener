@@ -1,5 +1,3 @@
-.SILENT:
-
 APP_NAME?=my-app
 
 # сборка отдельного приложения
@@ -18,9 +16,6 @@ gen-grpc:
 	--go_out=./pkg/sdk/go --go_opt=paths=source_relative \
 	--go-grpc_out=./pkg --go_opt=paths=source_relative
 
-.PHONY: create-migrator
-create-migrator:
-	docker build -t migrator ./db
 
 .PHONY: shutdown
 shutdown:
@@ -30,10 +25,14 @@ shutdown:
 test:
 	go test -v -count=1 ./...
 
-deploy: create-migrator
-	docker-compose up --build
-	sleep 4
+apply-migrations:
+	docker build -t migrator ./db
+	sleep 5
 	docker run --network host migrator  \
 	-path=/migrations/ \
 	-database "postgresql://postgres:postgres@localhost:7557/urls?sslmode=disable" up
+
+build-docker:
+	docker-compose up --build
+	 	
 	

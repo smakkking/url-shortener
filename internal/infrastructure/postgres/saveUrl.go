@@ -10,7 +10,7 @@ func (s *Storage) SaveURL(ctx context.Context, key string, urlToSave url.URL) er
 	const op = "postgres.SaveURL"
 
 	_, err := s.db.ExecContext(ctx,
-		"INSERT INTO Urls(alias, url_value) VALUES $1, $2",
+		"INSERT INTO Urls(alias, url_value) VALUES ($1, $2)",
 		key, urlToSave.String(),
 	)
 	if err != nil {
