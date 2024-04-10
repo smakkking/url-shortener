@@ -1,10 +1,8 @@
 package postgres
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
-	"net/url"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -40,31 +38,4 @@ func NewStorage(cfg app.Config) (*Storage, error) {
 	return &Storage{
 		db: db,
 	}, nil
-}
-
-func (s *Storage) SaveURL(ctx context.Context, key string, urlToSave url.URL) error {
-	const op = "postgres.SaveURL"
-
-	_, err := s.db.ExecContext(ctx,
-		"INSERT INTO Urls(alias, url_value) VALUES $1, $2",
-		key, urlToSave.String(),
-	)
-	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
-	}
-
-	return nil
-}
-
-func (s *Storage) GetURL(ctx context.Context, key string) (url.URL, error) {
-	const op = "postgres.GetURL"
-
-	var data string
-	err := s.db.QueryRowContext(ctx, "SELECT url_value FROM Urls WHERE alias = $1", key).Scan(&data)
-	if err != nil {
-		return url.URL{}, fmt.Errorf("%s : %w", op, err)
-	}
-
-	outputURL, _ := url.Parse(data)
-	return *outputURL, nil
 }

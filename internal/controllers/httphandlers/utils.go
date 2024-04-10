@@ -1,18 +1,24 @@
 package httphandlers
 
-type Response struct {
-	Status string `json:"status"`
-	Error  string `json:"error,omitempty"`
-}
-
 const (
 	StatusOK    = "OK"
 	StatusError = "Error"
 )
 
-func OK() Response {
+type Response struct {
+	Status string `json:"status"`
+	Error  string `json:"error,omitempty"`
+	Url    string `json:"url,omitempty"`
+}
+
+type Request struct {
+	URL string `json:"url"`
+}
+
+func OK(url string) Response {
 	return Response{
 		Status: StatusOK,
+		Url:    url,
 	}
 }
 
