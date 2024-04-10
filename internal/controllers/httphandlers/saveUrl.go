@@ -38,5 +38,5 @@ func (h *Handler) SaveURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render.JSON(w, r, OK("http://"+r.URL.Hostname()+"/"+alias))
+	render.JSON(w, r, OK("http://localhost:8080/"+alias))
 }

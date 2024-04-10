@@ -15,5 +15,6 @@ func (s *Storage) SaveURL(ctx context.Context, key string, urlToSave url.URL) (s
 	}
 
 	s.aliasToURL[key] = urlToSave
+	s.urlToAlias[urlToSave] = key
 	return key, nil
 }

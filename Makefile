@@ -27,7 +27,7 @@ test:
 
 apply-migrations:
 	docker build -t migrator ./db
-	sleep 5
+	sleep 20
 	docker run --network host migrator  \
 	-path=/migrations/ \
 	-database "postgresql://postgres:postgres@localhost:7557/urls?sslmode=disable" up
