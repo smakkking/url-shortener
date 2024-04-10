@@ -2,6 +2,7 @@ package httpserver
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"sync"
 
@@ -49,7 +50,9 @@ func (h *HTTPService) Run(wg *sync.WaitGroup) {
 
 	err := h.srv.ListenAndServe()
 	if err != nil {
-		logrus.Errorf("cannot start server: %s", err.Error())
+		if !errors.Is(err, http.ErrServerClosed) {
+			logrus.Errorf("cannot start server: %s", err.Error())
+		}
 	}
 }
 

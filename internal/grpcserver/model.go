@@ -45,5 +45,5 @@ func (s *GRPCService) Run(wg *sync.WaitGroup) {
 }
 
 func (s *GRPCService) Shutdown(ctx context.Context) {
-	s.grpcServer.Stop()
+	s.grpcServer.GracefulStop()
 }

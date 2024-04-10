@@ -30,7 +30,7 @@ func (h *Handler) SaveURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	outputURL, err := h.urlService.SaveURL(r.Context(), *inputURL)
+	alias, err := h.urlService.SaveURL(r.Context(), *inputURL)
 	if err != nil {
 		logrus.Errorf("can't save url! %v", fmt.Errorf("%s: %w", op, err))
 		w.WriteHeader(http.StatusInternalServerError)
@@ -38,5 +38,5 @@ func (h *Handler) SaveURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render.JSON(w, r, OK("http://"+r.URL.Host+"/"+outputURL))
+	render.JSON(w, r, OK("http://"+r.URL.Hostname()+"/"+alias))
 }

@@ -26,6 +26,6 @@ func (s *ServerAPI) Save(ctx context.Context, req *urlshortener_grpc.SaveRequest
 	}
 
 	return &urlshortener_grpc.SaveResponce{
-		Alias: alias,
+		Alias: "http://localhost:8080/" + alias,
 	}, nil
 }
