@@ -24,28 +24,21 @@ const (
 	dbType     = "inmemory"
 )
 
+var (
+	modeDev = os.Getenv("ENV") == ""
+)
+
 func main() {
+	// init логгер
+	setupLogger()
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-
-	// init логгер
-	logrus.SetFormatter(
-		&logrus.JSONFormatter{
-			PrettyPrint:     true,
-			TimestampFormat: "2006-01-02 15:04:05",
-		},
-	)
-	logrus.SetOutput(os.Stdout)
-
 	logrus.Infoln("service started...")
 	logrus.Debugln("debug messages are available")
 
 	// загрузка конфига
-	config, err := app.NewConfig(configPath)
-	if err != nil {
-		logrus.Errorf("error reading config: %s", err.Error())
-		os.Exit(1)
-	}
+	config, err := app.MustLoadConfig(configPath)
 
 	// init репозитории
 	var store services.Storage
@@ -97,4 +90,21 @@ func main() {
 
 	wg.Wait()
 	logrus.Infoln("server stopped")
+}
+
+func setupLogger() {
+	logrus.SetFormatter(
+		&logrus.JSONFormatter{
+			PrettyPrint:     true,
+			TimestampFormat: "2006-01-02 15:04:05",
+		},
+	)
+	logrus.SetOutput(os.Stdout)
+
+	if modeDev {
+		logrus.SetLevel(logrus.DebugLevel)
+	} else {
+		logrus.SetLevel(logrus.InfoLevel)
+	}
+
 }

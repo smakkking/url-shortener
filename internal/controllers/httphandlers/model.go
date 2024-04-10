@@ -2,6 +2,7 @@ package httphandlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 
@@ -21,35 +22,41 @@ type R struct {
 }
 
 func (h *Handler) SaveURL(w http.ResponseWriter, r *http.Request) {
+	const op = "httphandler.SaveURL"
+
 	data := new(R)
 	err := json.NewDecoder(r.Body).Decode(data)
 	if err != nil {
-		logrus.Errorf("%s", err.Error())
+		logrus.Errorf("can't save url! %v", fmt.Errorf("%s: %w", op, err))
 		render.JSON(w, r, Error("invalid input json"))
 		return
 	}
 
 	inputURL, err := url.Parse(data.URL)
 	if err != nil {
-		logrus.Errorf("%s", err.Error())
+		logrus.Errorf("can't save url! %v", fmt.Errorf("%s: %w", op, err))
 		render.JSON(w, r, Error("invalid input data"))
 		return
 	}
 
 	outputURL, err := h.urlService.SaveURL(r.Context(), *inputURL)
 	if err != nil {
+		logrus.Errorf("can't save url! %v", fmt.Errorf("%s: %w", op, err))
 		render.JSON(w, r, Error("can't save url"))
 		return
 	}
 
-	render.JSON(w, r, R{URL: outputURL})
+	render.JSON(w, r, R{URL: "http://" + r.URL.Host + "/" + outputURL})
 }
 
 func (h *Handler) GetURL(w http.ResponseWriter, r *http.Request) {
+	const op = "httphandler.GetURL"
+
 	alias := chi.URLParam(r, "alias")
 
 	outputURL, err := h.urlService.GetURL(r.Context(), alias)
 	if err != nil {
+		logrus.Errorf("can't get url! %v", fmt.Errorf("%s: %w", op, err))
 		render.JSON(w, r, Error("can't get url"))
 		return
 	}

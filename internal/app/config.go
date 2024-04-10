@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
@@ -23,13 +24,13 @@ type Config struct {
 	GrpcPort string `yaml:"GRPC_PORT" env:"GRPC_PORT"`
 }
 
-func NewConfig(config_path string) (Config, error) {
+func MustLoadConfig(config_path string) (Config, error) {
 	cfg := Config{}
 	err := cleanenv.ReadConfig(config_path, &cfg)
-
 	if err != nil {
-		return Config{}, err
+		panic(fmt.Errorf("error reading config: %w", err))
 	}
-	logrus.Info(cfg)
+
+	logrus.Debugln(cfg)
 	return cfg, nil
 }

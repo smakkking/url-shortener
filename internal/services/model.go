@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/url"
 
 	"github.com/smakkking/url-shortener/pkg/keygenerator"
@@ -23,17 +24,26 @@ type Storage interface {
 }
 
 func (s *Service) SaveURL(ctx context.Context, urlToSave url.URL) (string, error) {
+	const op = "service.SaveURL"
+
 	key := keygenerator.GenRandomString(10)
 
 	err := s.urlStorage.SaveURL(ctx, key, urlToSave)
 	if err != nil {
-		return "", ErrSavingURL
+		return "", fmt.Errorf("%s: %w", op, ErrSavingURL)
 	}
 
-	return "http://localhost:8080/" + key, nil
+	return key, nil
 
 }
 
 func (s *Service) GetURL(ctx context.Context, key string) (url.URL, error) {
-	return s.urlStorage.GetURL(ctx, key)
+	const op = "service.GetURL"
+
+	originalURL, err := s.urlStorage.GetURL(ctx, key)
+	if err != nil {
+		return originalURL, fmt.Errorf("%s: %w", op, ErrGettingURL)
+	}
+
+	return originalURL, nil
 }
