@@ -15,7 +15,7 @@ func (s *Service) SaveURL(ctx context.Context, urlToSave url.URL) (string, error
 
 	err := s.urlStorage.SaveURL(ctx, key, urlToSave)
 	if err != nil {
-		return "", fmt.Errorf("%s: %w", op, ErrSavingURL)
+		return "", fmt.Errorf("%s: %w", op, err)
 	}
 
 	return key, nil
