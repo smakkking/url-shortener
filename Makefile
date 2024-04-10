@@ -23,7 +23,7 @@ shutdown:
 
 .PHONY: test
 test:
-	go test -v -count=1 ./...
+	go test -count=1 ./...
 
 apply-migrations:
 	docker build -t migrator ./db
