@@ -17,3 +17,8 @@ make build-docker
 ```
 make apply-migrations
 ```
+
+Если вдруг нужно сбилдить только образ приложения, тогда
+```
+STORAGE=inmemory|postgres docker-compose build my_app
+```
