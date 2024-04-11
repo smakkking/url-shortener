@@ -9,6 +9,7 @@ services:
 
     environment:
       STORAGE: $STORAGE
+      ENV: prod
 
     depends_on:
       - postgres
